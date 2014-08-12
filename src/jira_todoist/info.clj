@@ -4,13 +4,13 @@
       [clojure.java.io :as io]))
 
 (defn readInfo []
-  (let [json (slurp (io/resource "info.json"))]
-    (json/read-str json :key-fn keyword)
-    ))
+  (json/read-str (slurp (io/resource "info.json")) :key-fn keyword))
 
-(defn todoistUsername [arg]
-  (json/read-str (slurp arg)))
+(defn todoistProjectName []
+  (get (readInfo) :todoist-project))
 
-(readInfo)
-(type readInfo)
-(get readInfo :name )
+(defn todoistUsername []
+  (get (readInfo) :email))
+
+(defn todoistPassword []
+  (get (readInfo) :password))
