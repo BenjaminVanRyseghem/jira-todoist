@@ -6,12 +6,8 @@
             [compojure.route :as route]))
 
 (defroutes app-routes
-  (GET "/" [] (println "webhook GET"))
   (POST "/" {body :body} (println (post/handlePost (slurp body))))
-  (PUT "/" [] (println "webhook PUT"))
-  (DELETE "/" [] (println "webhook DELETE"))
-  (route/resources "/")
-  (route/not-found "Not Found"))
+  (route/not-found :IGNORED))
 
 (def app
   (handler/site app-routes))
