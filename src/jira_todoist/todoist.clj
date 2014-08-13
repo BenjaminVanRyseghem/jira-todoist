@@ -66,48 +66,44 @@
 
 (defn createNewItemFromTicket [project ticket]
  (let [existingTicket (findItemForTicket todoistProject ticket)
-       shouldCreate (= existingTicket nil)]
-       (if shouldCreate (
-        (let [options (codec/form-encode {:content (str
-                                                  (get-in ticket [:issue :key])
-                                                  ": "
-                                                  (get-in ticket [:issue :summary]) )
-                                          :note (str
-                                               (get-in ticket [:issue :fields :description])
-                                               "\n"
-                                               (buildUrlForTicket ticket))
-                                          :project_id (get project :id)
-                                          :token (getToken)})
-              url (str "https://api.todoist.com/API/addItem?" options)
-              json (get (client/get url) :body)]
-              (json/read-str json :key-fn keyword))))))
+       options (codec/form-encode {:content (str
+                                             (get-in ticket [:issue :key])
+                                             ": "
+                                             (get-in ticket [:issue :fields :summary]))
+                                   :priority 1
+                                   :note (str
+                                          (get-in ticket [:issue :fields :description])
+                                          "\n\n==============================\nSee at: "
+                                          (buildUrlForTicket ticket))
+                                   :project_id (get project :id)
+                                   :token (getToken)})
+       url (str "https://api.todoist.com/API/addItem?" options)]
+
+       (if (= existingTicket nil)
+         (do
+           (client/get url)
+           "Ticket created")
+         "Ticket already exists"
+         )))
 
 (defn updateItemFromTicket [project ticket]
    (let [existingTicket (findItemForTicket todoistProject ticket)
          options (codec/form-encode {:content (str
                                                   (get-in ticket [:issue :key])
                                                   ": "
-                                                  (get-in ticket [:issue :summary]) )
-                                     :note (str
-                                            (get-in ticket [:issue :fields :description])
-                                            "\n"
-                                            (buildUrlForTicket ticket))
+                                                  (get-in ticket [:issue :fields :summary]))
                                      :id (get existingTicket :id)
                                      :token (getToken)})
-         url (str "https://api.todoist.com/API/updateItem?" options)
-         json (get (client/get url) :body)]
-     (json/read-str json :key-fn keyword)))
-;;
-;;
-;;
-
+         url (str "https://api.todoist.com/API/updateItem?" options)]
+         (client/get url)
+         "Tocket updated"))
 
 ;;
 ;; Tickets API
 ;;
 
 (defn assigneeChanged [ticket]
- (createNewItemFromTicket ticket))
+ (createNewItemFromTicket todoistProject ticket))
 
 (defn contentChanged [ticket]
- (updateItemFromTicket ticket))
+ (updateItemFromTicket todoistProject ticket))
