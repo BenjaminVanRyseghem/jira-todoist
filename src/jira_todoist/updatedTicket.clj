@@ -11,7 +11,7 @@
 
       (if assignee
         (todoist/assigneeChanged ticket)
-        (todoist/summaryChanged ticket)
+        (todoist/contentChanged ticket)
       )
   ))
 

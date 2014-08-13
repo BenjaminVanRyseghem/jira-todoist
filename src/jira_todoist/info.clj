@@ -12,5 +12,8 @@
 (defn todoistUsername []
   (get (readInfo) :email))
 
+(defn todoistJiraUrl []
+  (get (readInfo) :jiraUrl))
+
 (defn todoistPassword []
   (get (readInfo) :password))

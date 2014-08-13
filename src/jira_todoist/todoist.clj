@@ -2,8 +2,7 @@
    (:require [jira-todoist.info :as info]
              [ring.util.codec :as codec]
              [clj-http.client :as client]
-             [clojure.data.json :as json]
-))
+             [clojure.data.json :as json]))
 
 (defn find-first
     [f coll]
@@ -39,6 +38,10 @@
          my-filter (fn [each] (= (get each :name) name ))]
     (find-first my-filter projects)))
 
+
+(def todoistProject (getProjectByName (info/todoistProjectName)))
+
+
 (defn getItemsForProject [project]
   (let [
     options (codec/form-encode {:project_id (get project :id) :token (getToken)})
@@ -56,24 +59,55 @@
   (findItemByName project (get-in ticket [:issue :key])))
 
 
-(defn createNewItemFromTicket [project ticket])
-(defn updateItemFromTicket [project ticket])
+(defn buildUrlForTicket [ticket]
+  (str
+   (info/todoistJiraUrl) "/browse/" (get-in ticket [:issue :key])
+  ))
 
+(defn createNewItemFromTicket [project ticket]
+ (let [existingTicket (findItemForTicket todoistProject ticket)
+       shouldCreate (= existingTicket nil)]
+       (if shouldCreate (
+        (let [options (codec/form-encode {:content (str
+                                                  (get-in ticket [:issue :key])
+                                                  ": "
+                                                  (get-in ticket [:issue :summary]) )
+                                          :note (str
+                                               (get-in ticket [:issue :fields :description])
+                                               "\n"
+                                               (buildUrlForTicket ticket))
+                                          :project_id (get project :id)
+                                          :token (getToken)})
+              url (str "https://api.todoist.com/API/addItem?" options)
+              json (get (client/get url) :body)]
+              (json/read-str json :key-fn keyword))))))
+
+(defn updateItemFromTicket [project ticket]
+   (let [existingTicket (findItemForTicket todoistProject ticket)
+         options (codec/form-encode {:content (str
+                                                  (get-in ticket [:issue :key])
+                                                  ": "
+                                                  (get-in ticket [:issue :summary]) )
+                                     :note (str
+                                            (get-in ticket [:issue :fields :description])
+                                            "\n"
+                                            (buildUrlForTicket ticket))
+                                     :id (get existingTicket :id)
+                                     :token (getToken)})
+         url (str "https://api.todoist.com/API/updateItem?" options)
+         json (get (client/get url) :body)]
+     (json/read-str json :key-fn keyword)))
 ;;
 ;;
 ;;
 
-(def todoistProject (getProjectByName (info/todoistProjectName)))
 
 ;;
 ;; Tickets API
 ;;
 
 (defn assigneeChanged [ticket]
- (info/todoistUsername))
+ (createNewItemFromTicket ticket))
 
-;; (defn summaryChanged [ticket] "summary changed")
-(defn summaryChanged [ticket]
- (findItemForTicket todoistProject ticket))
-
-(defn descriptionChanged [ticket] "description changed")
+(defn contentChanged [ticket]
+ (updateItemFromTicket ticket))
