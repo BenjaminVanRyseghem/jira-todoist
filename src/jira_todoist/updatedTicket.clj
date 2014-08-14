@@ -7,6 +7,9 @@
   (let [ status (get-in ticket [:issue :fields :status :name]) ]
     (if (= status "Resolved")
       (todoist/completeItem ticket)
+      (if (= status "In Progress")
+             (todoist/setItemToToday ticket)
+             "Uninteresting status")
     )))
 
 (defn dispatchField [ticket]

@@ -107,9 +107,17 @@
          url (str "https://api.todoist.com/API/completeItems?" options)]
          (client/get url)
          "Ticket completed"
-;;      (println (str "ids: " ids))
-;;      url
      ))
+
+
+(defn setItemToTodayFromTicket [project ticket]
+   (let [existingTicket (findItemForTicket todoistProject ticket)
+         options (codec/form-encode {:date_string "today"
+                                     :id (get existingTicket :id)
+                                     :token (getToken)})
+         url (str "https://api.todoist.com/API/updateItem?" options)]
+         (client/get url)
+         "Ticket updated"))
 
 ;;
 ;; Tickets API
@@ -123,3 +131,7 @@
 
 (defn completeItem [ticket]
  (completeItemFromTicket todoistProject ticket))
+
+(defn setItemToToday [ticket]
+ (setItemToTodayFromTicket todoistProject ticket))
+
