@@ -33,10 +33,10 @@ Note that an `info.json` file is needed along the `jar` file.
 The `info.json` file is structured like this: 
 
     {
-	"email": "your todoist email address",
-	"password": "your todoist password",
-	"todoistProject": "the todoist project where will belong jira tickets",
-	"jireUrl": "your jira url e.g. http://my-jira.atlassian.net"
+        "email": "your todoist email address",
+        "password": "your todoist password",
+        "todoistProject": "the todoist project where will belong jira tickets",
+        "jireUrl": "your jira url e.g. http://my-jira.atlassian.net"
     }
 
 ## License
