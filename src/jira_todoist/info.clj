@@ -17,6 +17,3 @@
 
 (defn todoistPassword []
   (get (readInfo) :password))
-
-(defn todoistFixedStatus []
-  (get (readInfo) :fixedStatus))
