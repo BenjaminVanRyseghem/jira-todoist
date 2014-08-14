@@ -96,14 +96,30 @@
                                      :token (getToken)})
          url (str "https://api.todoist.com/API/updateItem?" options)]
          (client/get url)
-         "Tocket updated"))
+         "Ticket updated"))
+
+
+(defn completeItemFromTicket [project ticket]
+   (let [existingTicket (findItemForTicket todoistProject ticket)
+         ids  [ (get existingTicket :id) ]
+         options (codec/form-encode {:ids  [ ids ]
+                                     :token (getToken)})
+         url (str "https://api.todoist.com/API/completeItems?" options)]
+         (client/get url)
+         "Ticket completed"
+;;      (println (str "ids: " ids))
+;;      url
+     ))
 
 ;;
 ;; Tickets API
 ;;
 
-(defn assigneeChanged [ticket]
+(defn createNewItem [ticket]
  (createNewItemFromTicket todoistProject ticket))
 
-(defn contentChanged [ticket]
+(defn updateItemContent [ticket]
  (updateItemFromTicket todoistProject ticket))
+
+(defn completeItem [ticket]
+ (completeItemFromTicket todoistProject ticket))
