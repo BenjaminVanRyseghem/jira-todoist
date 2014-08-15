@@ -4,27 +4,23 @@
 (def interesting-fields ["assignee" "description" "summary" "status"])
 
 (defn status-changed [ticket]
-  (let [ status (get-in ticket [:issue :fields :status :name]) ]
+  (let [status (get-in ticket [:issue :fields :status :name])]
     (if (= status "Resolved")
       (todoist/complete-item ticket)
       (if (= status "In Progress")
         (todoist/set-item-to-today ticket)
-        "Uninteresting status")
-      )))
+        "Uninteresting status"))))
 
 (defn dispatch-field [ticket]
-  (let [
-        items (get-in ticket [:changelog :items])
+  (let [items (get-in ticket [:changelog :items])
         assignee (some (fn [item] (= (get item :field) "assignee")) items)
-        status (some (fn [item] (= (get item :field) "status")) items)
-        ]
+        status (some (fn [item] (= (get item :field) "status")) items)]
 
     (if assignee
       (todoist/create-new-item ticket)
       (if status
         (status-changed ticket)
-        (todoist/update-item-content ticket))
-      )))
+        (todoist/update-item-content ticket)))))
 
 (defn ticket-valid? [ticket]
   (def items (get-in ticket [:changelog :items]))

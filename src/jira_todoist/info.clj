@@ -4,10 +4,10 @@
    [clojure.java.io :as io]))
 
 
-(letfn [ (read-info []
+(letfn [(read-info []
                     (json/read-str
                      (slurp (io/file (-> (java.io.File. "info.json") .getAbsolutePath)))
-                     :key-fn keyword)) ]
+                     :key-fn keyword))]
   (defn todoist-project-name []
     (get (read-info) :todoistProject))
 

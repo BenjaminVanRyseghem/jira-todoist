@@ -14,19 +14,17 @@
   (.contains s substring))
 
 
-(letfn [ (login []
-                (let [
-                      options (codec/form-encode {:email (info/todoistUsername) :password (info/todoistPassword)})
-                      url (str "https://api.todoist.com/API/login?" options)
-                      json (get (client/get url) :body)
-                      body (json/read-str json :key-fn keyword)]
-                  (get body :token))) ]
+(letfn [(login []
+               (let [options (codec/form-encode {:email (info/todoistUsername) :password (info/todoistPassword)})
+                     url (str "https://api.todoist.com/API/login?" options)
+                     json (get (client/get url) :body)
+                     body (json/read-str json :key-fn keyword)]
+                 (get body :token)))]
 
   (def get-token (memoize login)))
 
 (defn get-projects []
-  (let [
-        options (codec/form-encode {:token (getToken)})
+  (let [options (codec/form-encode {:token (getToken)})
         url (str "https://api.todoist.com/API/getProjects?" options)
         json (get (client/get url) :body)
         body (json/read-str json :key-fn keyword)]
@@ -34,8 +32,8 @@
 
 
 (defn get-project-by-name [name]
-  (let [ projects (getProjects)
-         my-filter (fn [each] (= (get each :name) name ))]
+  (let [projects (getProjects)
+        my-filter (fn [each] (= (get each :name) name))]
     (find-first my-filter projects)))
 
 
@@ -43,26 +41,24 @@
 
 
 (defn get-items-for-project [project]
-  (let [
-        options (codec/form-encode {:project_id (get project :id) :token (getToken)})
+  (let [options (codec/form-encode {:project_id (get project :id) :token (getToken)})
         url (str "https://api.todoist.com/API/getUncompletedItems?" options)
         json (get (client/get url) :body)
         body (json/read-str json :key-fn keyword)]
     body))
 
-(defn find-tem-by-name [project name]
-  (let [ items (get-items-for-project project)
-         my-filter (fn [each] (substring? name (get each :content)))]
+(defn find-item-by-name [project name]
+  (let [items (get-items-for-project project)
+        my-filter (fn [each] (substring? name (get each :content)))]
     (find-first my-filter items)))
 
 (defn find-item-for-ticket [project ticket]
-  (findItemByName project (get-in ticket [:issue :key])))
+  (find-item-by-name project (get-in ticket [:issue :key])))
 
 
 (defn build-url-for-ticket [ticket]
   (str
-   (info/todoist-jira-url) "/browse/" (get-in ticket [:issue :key])
-   ))
+   (info/todoist-jira-url) "/browse/" (get-in ticket [:issue :key])))
 
 (defn create-new-item-from-ticket [project ticket]
   (let [existing-ticket (find-item-for-ticket todoist-project ticket)
@@ -83,8 +79,7 @@
       (do
         (client/get url)
         "Ticket created")
-      "Ticket already exists"
-      )))
+      "Ticket already exists")))
 
 (defn update-item-from-ticket [project ticket]
   (let [existing-ticket (find-item-for-ticket todoist-project ticket)
@@ -101,13 +96,12 @@
 
 (defn complete-item-from-ticket [project ticket]
   (let [existing-ticket (find-item-for-ticket todoist-project ticket)
-        ids  [ (get existing-ticket :id) ]
-        options (codec/form-encode {:ids  [ ids ]
+        ids [(get existing-ticket :id)]
+        options (codec/form-encode {:ids  [ids]
                                     :token (get-token)})
         url (str "https://api.todoist.com/API/completeItems?" options)]
     (client/get url)
-    "Ticket completed"
-    ))
+    "Ticket completed"))
 
 
 (defn set-item-to-today-from-ticket [project ticket]
