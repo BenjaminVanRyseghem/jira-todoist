@@ -1,15 +1,14 @@
 (ns jira-todoist.post
   (:require [clojure.data.json :as json]
-            [jira-todoist.updatedTicket :as updated]))
+            [jira-todoist.updated-ticket :as updated]))
 
 
-(defmulti dispatchTicketEvent
+(defmulti dispatch-ticket-event
   (fn [t] (get t :webhookEvent)))
-(defmethod dispatchTicketEvent "jira:issue_updated"
-  [ticket] (updated/dispatchOnUpdate ticket))
 
+(defmethod dispatch-ticket-event "jira:issue_updated"
+  [ticket] (updated/dispatch-on-update ticket))
 
-
-(defn handlePost [json]
+(defn handle-post [json]
   (def ticket (json/read-str json :key-fn keyword))
-  (dispatchTicketEvent ticket))
+  (dispatch-ticket-event ticket))

@@ -1,19 +1,21 @@
 (ns jira-todoist.info
-   (:require
-      [clojure.data.json :as json]
-      [clojure.java.io :as io]))
+  (:require
+   [clojure.data.json :as json]
+   [clojure.java.io :as io]))
 
-(defn readInfo []
-  (json/read-str (slurp (io/file (-> (java.io.File. "info.json") .getAbsolutePath))) :key-fn keyword))
 
-(defn todoistProjectName []
-  (get (readInfo) :todoistProject))
+(letfn [ (read-info []
+                    (json/read-str
+                     (slurp (io/file (-> (java.io.File. "info.json") .getAbsolutePath)))
+                     :key-fn keyword)) ]
+  (defn todoist-project-name []
+    (get (read-info) :todoistProject))
 
-(defn todoistUsername []
-  (get (readInfo) :email))
+  (defn todoist-username []
+    (get (read-info) :email))
 
-(defn todoistJiraUrl []
-  (get (readInfo) :jiraUrl))
+  (defn todoist-jira-url []
+    (get (read-info) :jiraUrl))
 
-(defn todoistPassword []
-  (get (readInfo) :password))
+  (defn todoist-password []
+    (get (read-info) :password)))
