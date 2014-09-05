@@ -43,5 +43,5 @@ The `info.json` file is structured like this:
 
 Copyright © 2014 Benjamin Van Ryseghem.
 
-The files contained is this repository are under the GPL v2 licence.
+Distributed under the Eclipse Public License either version 1.0 or (at your option) any later version.
 See `LICENCE` for me information.
