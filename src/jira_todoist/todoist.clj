@@ -15,7 +15,7 @@
 
 
 (letfn [(login []
-               (let [options (codec/form-encode {:email (info/todoistUsername) :password (info/todoistPassword)})
+               (let [options (codec/form-encode {:email (info/todoist-username) :password (info/todoist-password)})
                      url (str "https://api.todoist.com/API/login?" options)
                      json (get (client/get url) :body)
                      body (json/read-str json :key-fn keyword)]
@@ -24,7 +24,7 @@
   (def get-token (memoize login)))
 
 (defn get-projects []
-  (let [options (codec/form-encode {:token (getToken)})
+  (let [options (codec/form-encode {:token (get-token)})
         url (str "https://api.todoist.com/API/getProjects?" options)
         json (get (client/get url) :body)
         body (json/read-str json :key-fn keyword)]
@@ -32,7 +32,7 @@
 
 
 (defn get-project-by-name [name]
-  (let [projects (getProjects)
+  (let [projects (get-projects)
         my-filter (fn [each] (= (get each :name) name))]
     (find-first my-filter projects)))
 
@@ -41,7 +41,7 @@
 
 
 (defn get-items-for-project [project]
-  (let [options (codec/form-encode {:project_id (get project :id) :token (getToken)})
+  (let [options (codec/form-encode {:project_id (get project :id) :token (get-token)})
         url (str "https://api.todoist.com/API/getUncompletedItems?" options)
         json (get (client/get url) :body)
         body (json/read-str json :key-fn keyword)]
